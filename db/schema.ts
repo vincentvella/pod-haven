@@ -33,6 +33,24 @@ export const podcasts = sqliteTable("podcasts", {
   contentAdvisoryRating: text("contentAdvisoryRating"),
   genreIds: text("genreIds", { mode: "json" }), // stringified array of genre ids
   genres: text("genres", { mode: "json" }), // stringified array of genre names
+});
+
+export const episodes = sqliteTable("episodes", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  episodeId: text("episodeId"),
+  title: text("title"),
+  description: text("description"),
+  link: text("link"),
+  published: integer("published"),
+  created: integer("created"),
+  category: text("category", { mode: "json" }),
+  content: text("content"),
+  enclosures: text("enclosures", { mode: "json" }),
+  content_encoded: text("content_encoded"),
+  itunes_duration: text("itunes_duration"),
+  itunes_episode_type: text("itunes_episode_type"),
+  media: text("media", { mode: "json" }),
+  podcastId: integer("podcastId").references(() => podcasts.id),
   listened: integer("watched", { mode: "boolean" }).default(false),
   dismissed: integer("dismissed", { mode: "boolean" }).default(false),
 });

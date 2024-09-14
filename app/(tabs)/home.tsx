@@ -1,4 +1,4 @@
-import { Image, StyleSheet } from "react-native";
+import { Image } from "react-native";
 import { View, FlatList } from "react-native";
 
 import { usePodcasts } from "@/db/hooks/podcasts";
