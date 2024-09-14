@@ -1,49 +1,31 @@
-import { FlatList, Image, TextInput, View } from "react-native";
+import {
+  ActivityIndicator,
+  FlatList,
+  Image,
+  TextInput,
+  View,
+} from "react-native";
+import { db } from "@/db/db";
+import { podcasts as podcastTable } from "@/db/schema";
 
-type Podcast = {
-  wrapperType: string;
-  kind: string;
-  collectionId: number;
-  trackId: number;
-  artistName: string;
-  collectionName: string;
-  trackName: string;
-  collectionCensoredName: string;
-  trackCensoredName: string;
-  collectionViewUrl: string;
-  feedUrl: string;
-  trackViewUrl: string;
-  artworkUrl30: string;
-  artworkUrl60: string;
-  artworkUrl100: string;
-  collectionPrice: number;
-  trackPrice: number;
-  collectionHdPrice: number;
-  releaseDate: string;
-  collectionExplicitness: string;
-  trackExplicitness: string;
-  trackCount: number;
-  trackTimeMillis: number;
-  country: string;
-  currency: string;
-  primaryGenreName: string;
-  contentAdvisoryRating: string;
-  artworkUrl600: string;
-  genreIds: string[];
-  genres: string[];
-};
+export type Podcast = typeof podcasts.$inferSelect;
 
 import { Text } from "@/components/Text";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Fragment, useState } from "react";
 import { TabBarIcon } from "@/components/navigation/TabBarIcon";
 import { Pressable } from "@/components/Pressable";
+import { podcasts } from "@/db/schema";
+import { eq } from "drizzle-orm";
+import { usePodcasts } from "@/db/hooks/podcasts";
 
 export default function SearchScreen() {
+  const [settingPodcast, setSettingPodcast] = useState<Podcast>();
   const [input, setInput] = useState("");
   const [searched, setSearched] = useState(false);
   const [resultCount, setResultCount] = useState(0);
   const [podcasts, setPodcasts] = useState<Podcast[]>([]);
+  const { data: savedPodcasts } = usePodcasts();
 
   const search = async () => {
     const uri = `https://itunes.apple.com/search?term=${input}&entity=podcast`;
@@ -60,11 +42,23 @@ export default function SearchScreen() {
     setPodcasts(uniquePodcasts);
   };
 
+  const addPodcastToLibrary = async (podcast: Podcast) => {
+    setSettingPodcast(podcast);
+    await db.insert(podcastTable).values(podcast);
+    setSettingPodcast(undefined);
+  };
+
+  const removePodcastFromLibrary = async (podcast: Podcast) => {
+    await db
+      .delete(podcastTable)
+      .where(eq(podcastTable.feedUrl, podcast.feedUrl ?? ""));
+  };
+
   return (
     <View className="flex-1 bg-slate-950">
       <SafeAreaView>
         <FlatList
-          keyExtractor={(item) => item.feedUrl}
+          keyExtractor={(item) => item.feedUrl ?? ""}
           stickyHeaderIndices={[0]}
           ListHeaderComponent={
             <View className="bg-gray-950">
@@ -101,40 +95,66 @@ export default function SearchScreen() {
             </View>
           }
           data={podcasts}
-          renderItem={({ item }) => (
-            <Fragment key={item.feedUrl}>
-              <Pressable
-                key={item.feedUrl}
-                className="bg-slate-800 rounded-xl p-4"
-              >
-                <View className="flex-row">
-                  <Image
-                    source={{ uri: item.artworkUrl60 }}
-                    className="w-20 h-20 rounded-xl"
-                  />
-                  <View className="flex-1 ml-5">
-                    <Text
-                      type="title"
-                      className="pt-2 text-2xl"
-                      numberOfLines={2}
-                    >
-                      {item.collectionName}
-                    </Text>
-                  </View>
-                </View>
-                <Text type="subtitle" className="mt-2" numberOfLines={2}>
-                  {item.feedUrl}
-                </Text>
+          renderItem={({ item }) => {
+            const isSaved = savedPodcasts.find(
+              (podcast) => podcast.feedUrl === item.feedUrl,
+            );
+            return (
+              <Fragment key={item.feedUrl}>
                 <Pressable
-                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                  onPress={() => console.log("add to library")}
-                  className="bg-green-500 rounded-full p-4 self-end"
+                  key={item.feedUrl}
+                  className="bg-slate-800 rounded-xl p-4"
                 >
-                  <TabBarIcon name="add" style={{ alignSelf: "center" }} />
+                  <View className="flex-row">
+                    {item.artworkUrl60 && (
+                      <Image
+                        source={{ uri: item.artworkUrl60 }}
+                        className="w-20 h-20 rounded-xl"
+                      />
+                    )}
+                    <View className="flex-1 ml-5">
+                      <Text
+                        type="title"
+                        className="pt-2 text-2xl"
+                        numberOfLines={2}
+                      >
+                        {item.collectionName}
+                      </Text>
+                    </View>
+                  </View>
+                  <Text type="subtitle" className="mt-2" numberOfLines={2}>
+                    {item.feedUrl}
+                  </Text>
+                  <Pressable
+                    disabled={settingPodcast === item}
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                    onPress={() => {
+                      isSaved
+                        ? removePodcastFromLibrary(item)
+                        : addPodcastToLibrary(item);
+                    }}
+                    className="bg-green-500 rounded-full p-4 self-end"
+                  >
+                    {!!isSaved && (
+                      <TabBarIcon
+                        name="checkmark-sharp"
+                        style={{ alignSelf: "center" }}
+                      />
+                    )}
+                    {!isSaved &&
+                      (settingPodcast === item ? (
+                        <ActivityIndicator color="black" />
+                      ) : (
+                        <TabBarIcon
+                          name="add"
+                          style={{ alignSelf: "center" }}
+                        />
+                      ))}
+                  </Pressable>
                 </Pressable>
-              </Pressable>
-            </Fragment>
-          )}
+              </Fragment>
+            );
+          }}
           ItemSeparatorComponent={() => <View className="h-2" />}
           ListEmptyComponent={() => <Text>No results found</Text>}
         />

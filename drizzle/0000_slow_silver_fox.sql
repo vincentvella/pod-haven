@@ -29,5 +29,7 @@ CREATE TABLE `podcasts` (
 	`primaryGenreName` text,
 	`contentAdvisoryRating` text,
 	`genreIds` text,
-	`genres` text
+	`genres` text,
+	`watched` integer DEFAULT false,
+	`dismissed` integer DEFAULT false
 );

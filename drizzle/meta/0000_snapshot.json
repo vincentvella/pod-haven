@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "1eca9ac7-6b60-4c35-9eab-4d2a5af2a099",
+  "id": "48f671a1-675b-4394-a508-216f0dc3357b",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "podcasts": {
@@ -223,6 +223,22 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
+        },
+        "watched": {
+          "name": "watched",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": false
+        },
+        "dismissed": {
+          "name": "dismissed",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": false
         }
       },
       "indexes": {},

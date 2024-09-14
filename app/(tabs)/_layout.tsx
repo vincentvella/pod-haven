@@ -30,9 +30,9 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="your-library"
+        name="your-queue"
         options={{
-          title: "Your Library",
+          title: "Your Queue",
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon
               name={focused ? "albums" : "albums-outline"}

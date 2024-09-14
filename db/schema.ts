@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, integer, blob } from "drizzle-orm/sqlite-core";
 
 export const podcasts = sqliteTable("podcasts", {
   id: integer("id").primaryKey({ autoIncrement: true }),
@@ -31,6 +31,8 @@ export const podcasts = sqliteTable("podcasts", {
   currency: text("currency"),
   primaryGenreName: text("primaryGenreName"),
   contentAdvisoryRating: text("contentAdvisoryRating"),
-  genreIds: text("genreIds"), // array of strings separated by commas (,) in the db file
-  genres: text("genres"), // array of strings separated by commas (,) in the db file
+  genreIds: text("genreIds", { mode: "json" }), // stringified array of genre ids
+  genres: text("genres", { mode: "json" }), // stringified array of genre names
+  listened: integer("watched", { mode: "boolean" }).default(false),
+  dismissed: integer("dismissed", { mode: "boolean" }).default(false),
 });

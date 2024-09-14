@@ -1,3 +1,4 @@
+import { cn } from "@/utils/cn";
 import {
   Text as NativeText,
   type TextProps as NativeTextProps,
@@ -9,7 +10,6 @@ export interface TextProps extends NativeTextProps {
 }
 
 import { cva } from "class-variance-authority";
-import clsx from "clsx";
 
 const text = cva([], {
   variants: {
@@ -26,10 +26,6 @@ const text = cva([], {
 
 export function Text({ type, className, ...props }: TextProps) {
   const textProps = text({ type });
-  return (
-    <NativeText
-      {...props}
-      className={clsx(["dark:text-white text-black", textProps, className])}
-    />
-  );
+  const merged = cn("dark:text-white text-black", textProps, className);
+  return <NativeText {...props} className={merged} />;
 }
