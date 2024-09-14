@@ -7,6 +7,7 @@ import { TabBarIcon } from "@/components/navigation/TabBarIcon";
 import { Pressable } from "@/components/Pressable";
 import { Fragment } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Link, router } from "expo-router";
 
 export default function HomeScreen() {
   const { data: savedPodcasts } = usePodcasts();
@@ -27,6 +28,7 @@ export default function HomeScreen() {
               <Pressable
                 key={item.feedUrl}
                 className="bg-slate-800 rounded-xl m-4 p-4"
+                onPress={() => router.navigate(`/podcast/${item.id}`)}
               >
                 <View className="flex-row">
                   {item.artworkUrl60 && (

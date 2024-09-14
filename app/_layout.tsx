@@ -5,7 +5,7 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import { Stack, router } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import migrations from "../drizzle/migrations";
@@ -20,6 +20,8 @@ import "../global.css";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { db, expoDb } from "@/db/db";
+import { TabBarIcon } from "@/components/navigation/TabBarIcon";
+import { View } from "react-native";
 
 export const unstable_settings = {
   initialRouteName: "(tabs)/your-library",
@@ -30,6 +32,12 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const { success, error } = useMigrations(db, migrations);
+  useEffect(() => {
+    if (error) {
+      console.error(error);
+    }
+  }, [error]);
+
   useDrizzleStudio(expoDb);
 
   const colorScheme = useColorScheme();
@@ -52,6 +60,18 @@ export default function RootLayout() {
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
         <Stack initialRouteName="(tabs)/your-library">
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="podcast/[id]/index"
+            options={{
+              title: "",
+              headerBackTitleVisible: false,
+              headerTintColor: "#fff",
+            }}
+          />
+          <Stack.Screen
+            name="podcast/[id]/settings"
+            options={{ title: "", presentation: "modal", headerBackTitle: "" }}
+          />
           <Stack.Screen name="+not-found" />
         </Stack>
       </ThemeProvider>

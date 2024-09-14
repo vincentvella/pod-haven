@@ -6,7 +6,7 @@ import { usePodcasts } from "@/db/hooks/podcasts";
 import { Pressable } from "@/components/Pressable";
 import { TabBarIcon } from "@/components/navigation/TabBarIcon";
 import { fetchNewPodcasts } from "@/api/podcasts";
-import { useEpisodes } from "@/db/hooks/episodes";
+import { useReverseChronologicalUnwatchedEpisodes } from "@/db/hooks/episodes";
 import { Fragment } from "react";
 import { FlashList } from "@shopify/flash-list";
 
@@ -14,7 +14,7 @@ export type Episode = typeof episodesTable.$inferSelect;
 
 export default function QueueScreen() {
   const { data: savedPodcasts } = usePodcasts();
-  const { data: episodes } = useEpisodes();
+  const { data: episodes } = useReverseChronologicalUnwatchedEpisodes();
 
   const onRefresh = async () => {
     await fetchNewPodcasts(savedPodcasts);
@@ -25,6 +25,7 @@ export default function QueueScreen() {
   return (
     <View className={`flex-1 bg-slate-950`} style={{ paddingTop: top }}>
       <FlashList
+        estimatedItemSize={114}
         ListHeaderComponent={
           <>
             <View className="flex-row items-center justify-center">
