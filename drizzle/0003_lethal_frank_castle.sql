@@ -1,0 +1,1 @@
+ALTER TABLE `episodes` RENAME COLUMN `watched` TO `listened`;

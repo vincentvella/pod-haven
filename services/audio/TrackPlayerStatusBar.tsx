@@ -6,10 +6,15 @@ import { Platform, View, useWindowDimensions } from "react-native";
 import TrackPlayer, {
   useActiveTrack,
   useProgress,
-  usePlaybackState,
+  useIsPlaying,
+  useTrackPlayerEvents,
+  Event,
 } from "react-native-track-player";
 import Slider, { ISlider } from "rn-video-slider";
 import { useEffect, useRef } from "react";
+import { episodes } from "@/db/schema";
+import { db } from "@/db/db";
+import { eq } from "drizzle-orm";
 
 function formatPlaybackTime(seconds: number) {
   const hours = Math.floor(seconds / 3600);
@@ -29,7 +34,8 @@ function AudioSeeker() {
   useEffect(() => {
     if (ref.current) {
       const progressBarProgress =
-        Math.floor(progress.position) / Math.floor(progress.duration);
+        Math.floor(Math.min(progress.position, progress.duration)) /
+        Math.floor(progress.duration);
       const bufferProgress =
         Math.floor(progress.buffered) / Math.floor(progress.duration);
       if (typeof progressBarProgress === "number") {
@@ -49,7 +55,9 @@ function AudioSeeker() {
   return (
     <View className="flex-row items-center justify-center w-full">
       <Text type="title" className="text-md py-0 absolute left-2">
-        {formatPlaybackTime(Math.floor(progress.position))}
+        {formatPlaybackTime(
+          Math.floor(Math.min(progress.position, progress.duration)),
+        )}
       </Text>
       <Slider
         width={width * 0.7}
@@ -68,8 +76,30 @@ function AudioSeeker() {
 }
 
 export default function TrackPlayerStatusBar() {
-  const { state } = usePlaybackState();
+  const { playing: isPlaying } = useIsPlaying();
   const currentTrack = useActiveTrack();
+
+  useTrackPlayerEvents(
+    [Event.PlaybackActiveTrackChanged],
+    ({ lastTrack, lastPosition }) => {
+      if (!lastTrack) {
+        return;
+      }
+      if (Math.ceil(lastPosition) >= (lastTrack.duration ?? 0)) {
+        markLastPlayedEpisodeAsListened(lastTrack.id);
+      }
+    },
+  );
+
+  async function markLastPlayedEpisodeAsListened(id: string) {
+    if (!currentTrack) {
+      return;
+    }
+    await db
+      .update(episodes)
+      .set({ listened: true })
+      .where(eq(episodes.episodeId, id));
+  }
 
   if (!currentTrack) {
     return null;
@@ -123,13 +153,9 @@ export default function TrackPlayerStatusBar() {
             <Pressable className="rounded-full items-center" activeScale={0.8}>
               <TabBarIcon
                 onPress={() =>
-                  state === "playing" ? TrackPlayer.pause() : TrackPlayer.play()
+                  isPlaying ? TrackPlayer.pause() : TrackPlayer.play()
                 }
-                name={
-                  state === "playing"
-                    ? "pause-circle-sharp"
-                    : "play-circle-sharp"
-                }
+                name={isPlaying ? "pause-circle-sharp" : "play-circle-sharp"}
                 color="white"
                 style={{ alignSelf: "center" }}
                 size={60}

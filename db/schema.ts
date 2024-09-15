@@ -57,6 +57,6 @@ export const episodes = sqliteTable("episodes", {
   itunes_episode_type: text("itunes_episode_type"),
   media: text("media", { mode: "json" }),
   podcastId: integer("podcastId").references(() => podcasts.id),
-  listened: integer("watched", { mode: "boolean" }).default(false),
+  listened: integer("listened", { mode: "boolean" }).default(false),
   dismissed: integer("dismissed", { mode: "boolean" }).default(false),
 });
