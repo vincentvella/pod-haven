@@ -131,10 +131,10 @@ export default function TrackPlayerStatusBar() {
       backgroundStyle={{ backgroundColor: "#4b5563" }}
     >
       <View className="flex-1 bg-gray-600 items-center justify-center">
-        <Text type="title" className="text-xl py-0">
+        <Text type="title" className="text-xl py-0" numberOfLines={1}>
           {currentTrack.title}
         </Text>
-        <Text type="subtitle" className="py-2">
+        <Text type="subtitle" className="py-2" numberOfLines={1}>
           {currentTrack.artist}
         </Text>
         <AudioSeeker />
