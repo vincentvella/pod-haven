@@ -45,7 +45,13 @@ export const episodes = sqliteTable("episodes", {
   created: integer("created"),
   category: text("category", { mode: "json" }),
   content: text("content"),
-  enclosures: text("enclosures", { mode: "json" }),
+  enclosures: text("enclosures", { mode: "json" }).$type<
+    {
+      length: string;
+      type: string;
+      url: string;
+    }[]
+  >(),
   content_encoded: text("content_encoded"),
   itunes_duration: text("itunes_duration"),
   itunes_episode_type: text("itunes_episode_type"),

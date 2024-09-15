@@ -1,3 +1,4 @@
+import "../services/audio/register-track-player";
 import "expo-dev-client";
 import {
   DarkTheme,
@@ -17,11 +18,14 @@ global.Buffer = require("buffer").Buffer;
 import "react-native-reanimated";
 import "../global.css";
 
-import { useColorScheme } from "@/hooks/useColorScheme";
+import { useColorScheme } from "@/services/theme/useColorScheme";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { db, expoDb } from "@/db/db";
-import { TabBarIcon } from "@/components/navigation/TabBarIcon";
+import useSetupTrackPlayer from "@/services/audio/useSetupTrackPlayer";
 import { View } from "react-native";
+import { Text } from "@/components/Text";
+import TrackPlayer from "react-native-track-player";
+import TrackPlayerStatusBar from "@/services/audio/TrackPlayerStatusBar";
 
 export const unstable_settings = {
   initialRouteName: "(tabs)/your-library",
@@ -32,6 +36,7 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const { success, error } = useMigrations(db, migrations);
+  const initializedTrackPlayer = useSetupTrackPlayer();
   useEffect(() => {
     if (error) {
       console.error(error);
@@ -46,12 +51,12 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
-    if (loaded) {
+    if (loaded && success && initializedTrackPlayer) {
       SplashScreen.hideAsync();
     }
-  }, [loaded]);
+  }, [loaded, success, initializedTrackPlayer]);
 
-  if (!loaded || !success) {
+  if (!loaded || !success || !initializedTrackPlayer) {
     return null;
   }
 

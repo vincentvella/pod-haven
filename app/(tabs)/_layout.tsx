@@ -3,7 +3,8 @@ import React from "react";
 
 import { TabBarIcon } from "@/components/navigation/TabBarIcon";
 import { Colors } from "@/constants/Colors";
-import { useColorScheme } from "@/hooks/useColorScheme";
+import { useColorScheme } from "@/services/theme/useColorScheme";
+import TrackPlayerStatusBar from "@/services/audio/TrackPlayerStatusBar";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();

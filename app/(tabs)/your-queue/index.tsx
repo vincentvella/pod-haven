@@ -1,23 +1,32 @@
 import { View } from "react-native";
 import { Text } from "@/components/Text";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { episodes as episodesTable } from "@/db/schema";
 import { usePodcasts } from "@/db/hooks/podcasts";
 import { Pressable } from "@/components/Pressable";
 import { TabBarIcon } from "@/components/navigation/TabBarIcon";
 import { fetchNewPodcasts } from "@/api/podcasts";
-import { useReverseChronologicalUnwatchedEpisodes } from "@/db/hooks/episodes";
+import { useReverseChronologicalUnwatchedEpisodesWithPodcastInfo } from "@/db/hooks/episodes";
 import { Fragment } from "react";
 import { FlashList } from "@shopify/flash-list";
-
-export type Episode = typeof episodesTable.$inferSelect;
+import TrackPlayer from "react-native-track-player";
+import { convertItemsToTracks } from "@/services/audio/convertEpisodesToTracks";
 
 export default function QueueScreen() {
   const { data: savedPodcasts } = usePodcasts();
-  const { data: episodes } = useReverseChronologicalUnwatchedEpisodes();
+  const { data: episodes } =
+    useReverseChronologicalUnwatchedEpisodesWithPodcastInfo();
 
   const onRefresh = async () => {
     await fetchNewPodcasts(savedPodcasts);
+  };
+
+  const onPressItem = (index: number) => {
+    // create slice of the episodes array from the index to the end of the array
+    const episodesSlice = episodes.slice(index);
+    const tracks = convertItemsToTracks(episodesSlice);
+    TrackPlayer.reset();
+    TrackPlayer.add(tracks);
+    TrackPlayer.play();
   };
 
   const { top } = useSafeAreaInsets();
@@ -53,15 +62,16 @@ export default function QueueScreen() {
           </>
         }
         data={episodes}
-        renderItem={({ item }) => (
-          <Fragment key={item.episodeId}>
+        renderItem={({ item, index }) => (
+          <Fragment key={item.episodes.episodeId}>
             <Pressable
-              key={item.episodeId}
+              onPress={() => onPressItem(index)}
+              key={item.episodes.episodeId}
               className="bg-slate-800 rounded-xl m-4 p-4"
             >
               <View className="flex-1 ml-5">
                 <Text type="title" className="pt-2 text-xl" numberOfLines={2}>
-                  {item.title}
+                  {item.episodes.title}
                 </Text>
               </View>
             </Pressable>
