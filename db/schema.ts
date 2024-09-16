@@ -59,4 +59,5 @@ export const episodes = sqliteTable("episodes", {
   podcastId: integer("podcastId").references(() => podcasts.id),
   listened: integer("listened", { mode: "boolean" }).default(false),
   dismissed: integer("dismissed", { mode: "boolean" }).default(false),
+  progress: integer("progress").default(0),
 });

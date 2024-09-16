@@ -7,7 +7,7 @@ import { TabBarIcon } from "@/components/navigation/TabBarIcon";
 import { Pressable } from "@/components/Pressable";
 import { Fragment } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Link, router } from "expo-router";
+import { router } from "expo-router";
 
 export default function HomeScreen() {
   const { data: savedPodcasts } = usePodcasts();

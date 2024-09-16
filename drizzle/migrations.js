@@ -5,6 +5,7 @@ import m0000 from './0000_slow_silver_fox.sql';
 import m0001 from './0001_melodic_trish_tilby.sql';
 import m0002 from './0002_young_boom_boom.sql';
 import m0003 from './0003_lethal_frank_castle.sql';
+import m0004 from './0004_big_hitman.sql';
 
   export default {
     journal,
@@ -12,7 +13,8 @@ import m0003 from './0003_lethal_frank_castle.sql';
       m0000,
 m0001,
 m0002,
-m0003
+m0003,
+m0004
     }
   }
   

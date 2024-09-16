@@ -11,6 +11,7 @@ function useSetupTrackPlayer() {
       TrackPlayer.setupPlayer().then(() => {
         setInitializedTrackPlayer(true);
         TrackPlayer.updateOptions({
+          progressUpdateEventInterval: 1,
           // Media control capabilities
           capabilities: [
             Capability.Play,

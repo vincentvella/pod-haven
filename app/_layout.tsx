@@ -1,4 +1,4 @@
-import "../services/audio/register-track-player";
+import "../services/audio/registerTrackPlayer";
 import "expo-dev-client";
 import {
   DarkTheme,
@@ -6,7 +6,7 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Stack, router } from "expo-router";
+import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import migrations from "../drizzle/migrations";
@@ -22,10 +22,6 @@ import { useColorScheme } from "@/services/theme/useColorScheme";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { db, expoDb } from "@/db/db";
 import useSetupTrackPlayer from "@/services/audio/useSetupTrackPlayer";
-import { View } from "react-native";
-import { Text } from "@/components/Text";
-import TrackPlayer from "react-native-track-player";
-import TrackPlayerStatusBar from "@/services/audio/TrackPlayerStatusBar";
 
 export const unstable_settings = {
   initialRouteName: "(tabs)/your-library",

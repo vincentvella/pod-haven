@@ -7,14 +7,9 @@ import TrackPlayer, {
   useActiveTrack,
   useProgress,
   useIsPlaying,
-  useTrackPlayerEvents,
-  Event,
 } from "react-native-track-player";
 import Slider, { ISlider } from "rn-video-slider";
 import { useEffect, useRef } from "react";
-import { episodes } from "@/db/schema";
-import { db } from "@/db/db";
-import { eq } from "drizzle-orm";
 
 function formatPlaybackTime(seconds: number) {
   const hours = Math.floor(seconds / 3600);
@@ -78,28 +73,6 @@ function AudioSeeker() {
 export default function TrackPlayerStatusBar() {
   const { playing: isPlaying } = useIsPlaying();
   const currentTrack = useActiveTrack();
-
-  useTrackPlayerEvents(
-    [Event.PlaybackActiveTrackChanged],
-    ({ lastTrack, lastPosition }) => {
-      if (!lastTrack) {
-        return;
-      }
-      if (Math.ceil(lastPosition) >= (lastTrack.duration ?? 0)) {
-        markLastPlayedEpisodeAsListened(lastTrack.id);
-      }
-    },
-  );
-
-  async function markLastPlayedEpisodeAsListened(id: string) {
-    if (!currentTrack) {
-      return;
-    }
-    await db
-      .update(episodes)
-      .set({ listened: true })
-      .where(eq(episodes.episodeId, id));
-  }
 
   if (!currentTrack) {
     return null;

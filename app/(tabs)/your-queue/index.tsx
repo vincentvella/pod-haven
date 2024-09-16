@@ -20,12 +20,16 @@ export default function QueueScreen() {
     await fetchNewPodcasts(savedPodcasts);
   };
 
-  const onPressItem = (index: number) => {
+  const onPressItem = async (index: number) => {
     // create slice of the episodes array from the index to the end of the array
     const episodesSlice = episodes.slice(index);
     const tracks = convertItemsToTracks(episodesSlice);
     TrackPlayer.reset();
     TrackPlayer.add(tracks);
+    const firstEpisode = episodesSlice[0];
+    if (firstEpisode.episodes.progress) {
+      TrackPlayer.seekTo(firstEpisode.episodes.progress);
+    }
     TrackPlayer.play();
   };
 
