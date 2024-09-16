@@ -24,13 +24,13 @@ export default function QueueScreen() {
     // create slice of the episodes array from the index to the end of the array
     const episodesSlice = episodes.slice(index);
     const tracks = convertItemsToTracks(episodesSlice);
-    TrackPlayer.reset();
-    TrackPlayer.add(tracks);
+    await TrackPlayer.reset();
+    await TrackPlayer.add(tracks);
     const firstEpisode = episodesSlice[0];
     if (firstEpisode.episodes.progress) {
-      TrackPlayer.seekTo(firstEpisode.episodes.progress);
+      await TrackPlayer.seekTo(firstEpisode.episodes.progress);
     }
-    TrackPlayer.play();
+    await TrackPlayer.play();
   };
 
   const { top } = useSafeAreaInsets();
