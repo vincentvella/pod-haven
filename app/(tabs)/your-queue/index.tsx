@@ -83,6 +83,7 @@ export default function QueueScreen() {
         )}
         ItemSeparatorComponent={() => <View className="h-2" />}
         ListEmptyComponent={() => <Text>No results found</Text>}
+        ListFooterComponent={() => <View className="h-52" />}
       />
     </View>
   );

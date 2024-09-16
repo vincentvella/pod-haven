@@ -1,10 +1,8 @@
 import { Tabs } from "expo-router";
 import React from "react";
-
 import { TabBarIcon } from "@/components/navigation/TabBarIcon";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/services/theme/useColorScheme";
-import TrackPlayerStatusBar from "@/services/audio/TrackPlayerStatusBar";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -47,6 +45,15 @@ export default function TabLayout() {
         options={{
           title: "Search",
           tabBarIcon: ({ color }) => <TabBarIcon name="search" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: "Settings",
+          tabBarIcon: ({ color }) => (
+            <TabBarIcon name="settings" color={color} />
+          ),
         }}
       />
     </Tabs>

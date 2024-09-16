@@ -1,7 +1,4 @@
 import "../services/audio/registerTrackPlayer";
-if (__DEV__) {
-  require("expo-dev-client");
-}
 import {
   DarkTheme,
   DefaultTheme,
@@ -13,17 +10,14 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import migrations from "../drizzle/migrations";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
-import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
-
-global.Buffer = require("buffer").Buffer;
-
-import "react-native-reanimated";
-import "../global.css";
-
+// import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
 import { useColorScheme } from "@/services/theme/useColorScheme";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { db, expoDb } from "@/db/db";
 import useSetupTrackPlayer from "@/services/audio/useSetupTrackPlayer";
+
+import "react-native-reanimated";
+import "../global.css";
 
 export const unstable_settings = {
   initialRouteName: "(tabs)/your-library",
@@ -41,7 +35,7 @@ export default function RootLayout() {
     }
   }, [error]);
 
-  useDrizzleStudio(expoDb);
+  // useDrizzleStudio(expoDb);
 
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({

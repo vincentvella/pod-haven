@@ -8,7 +8,9 @@ function useSetupTrackPlayer() {
   const [initializedTrackPlayer, setInitializedTrackPlayer] = useState(false);
   useEffect(() => {
     if (!initializedTrackPlayer) {
-      TrackPlayer.setupPlayer().then(() => {
+      TrackPlayer.setupPlayer({
+        autoHandleInterruptions: true,
+      }).then(() => {
         TrackPlayer.updateOptions({
           progressUpdateEventInterval: 1,
           // Media control capabilities
@@ -20,7 +22,13 @@ function useSetupTrackPlayer() {
             Capability.Stop,
           ],
           // Capabilities that will show up when the notification is in the compact form on Android
-          compactCapabilities: [Capability.Play, Capability.Pause],
+          compactCapabilities: [
+            Capability.Play,
+            Capability.Pause,
+            Capability.Stop,
+            Capability.SkipToNext,
+            Capability.SkipToPrevious,
+          ],
           android: {
             // This is the default behavior
             appKilledPlaybackBehavior:
