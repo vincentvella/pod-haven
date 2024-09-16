@@ -16,7 +16,9 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.vellapps.podhaven",
       "infoPlist": {
-        "UIBackgroundModes": ["audio"]
+        "UIBackgroundModes": [
+          "audio"
+        ]
       }
     },
     "android": {
@@ -31,9 +33,23 @@
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
-    "plugins": ["expo-router", "expo-build-properties"],
+    "plugins": [
+      "expo-router",
+      "expo-build-properties"
+    ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "dc339c44-41d3-4ad9-9ab4-285e639bb99e"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/dc339c44-41d3-4ad9-9ab4-285e639bb99e"
     }
   }
 }
