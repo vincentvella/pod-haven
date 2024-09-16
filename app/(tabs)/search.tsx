@@ -62,7 +62,7 @@ export default function SearchScreen() {
             </View>
             <TextInput
               placeholder="Search"
-              className="flex-1 bg-slate-200 text-slate-800 text-4xl py-4 z-0 rounded-r-xl pr-20"
+              className="flex-1 bg-slate-200 text-slate-800 text-3xl py-4 z-0 rounded-r-xl pr-20"
               onChangeText={setInput}
             />
           </View>
@@ -87,6 +87,7 @@ export default function SearchScreen() {
       </View>
       <FlashList
         estimatedItemSize={114}
+        extraData={savedPodcasts}
         contentContainerStyle={{ paddingHorizontal: 7 }}
         keyExtractor={(item) => item.feedUrl ?? ""}
         data={podcasts}

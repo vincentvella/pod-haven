@@ -1,9 +1,12 @@
 import { Pressable } from "@/components/Pressable";
+import ProgressBar from "@/components/ProgressBar";
 import { Text } from "@/components/Text";
 import { TabBarIcon } from "@/components/navigation/TabBarIcon";
 import { db } from "@/db/db";
 import { useEpisodes } from "@/db/hooks/episodes";
 import { podcasts } from "@/db/schema";
+import { convertItunesDuraitonToSeconds } from "@/services/audio/convertEpisodesToTracks";
+import { stripHtml } from "@/utils/html";
 import { FlashList } from "@shopify/flash-list";
 import { eq } from "drizzle-orm";
 import { useLiveQuery } from "drizzle-orm/expo-sqlite";
@@ -14,16 +17,6 @@ import { Image, View } from "react-native";
 function getId(id: string | string[]): number {
   if (typeof id === "string") return parseInt(id ?? 0);
   return parseInt(id[0] ?? 0);
-}
-
-function stripHtml(htmlString: string): string {
-  // Regular expression to match HTML tags
-  const htmlTagPattern = /<\/?[^>]+>/gi;
-
-  // Replace all HTML tags with an empty string
-  const textContent = htmlString.replace(htmlTagPattern, "");
-
-  return textContent;
 }
 
 export default function Podcast() {
@@ -107,8 +100,6 @@ export default function Podcast() {
                     {new Date(item.created ?? 0).toLocaleDateString()} -{" "}
                     {item.itunes_duration}
                   </Text>
-                  {/* Action Bar Row */}
-                  {/* Should contain add to queue, download, and play button */}
                   <View className="flex-row items-center pb-2">
                     <Pressable>
                       <TabBarIcon
@@ -147,6 +138,15 @@ export default function Podcast() {
                     </Pressable>
                   </View>
                 </View>
+
+                {!!item.progress && (
+                  <ProgressBar
+                    progress={item.progress}
+                    duration={convertItunesDuraitonToSeconds(
+                      item.itunes_duration ?? "00",
+                    )}
+                  />
+                )}
               </Pressable>
             </Fragment>
           );

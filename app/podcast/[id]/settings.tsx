@@ -1,13 +1,15 @@
 import { Pressable } from "@/components/Pressable";
 import { Text } from "@/components/Text";
 import { db } from "@/db/db";
-import { episodes as episodesTable } from "@/db/schema";
+import {
+  episodes as episodesTable,
+  podcasts as podcastsTable,
+} from "@/db/schema";
 import { useEpisodes } from "@/db/hooks/episodes";
 import { and, eq, lt } from "drizzle-orm";
 import { useGlobalSearchParams, useNavigation } from "expo-router";
 import { useEffect, useState } from "react";
 import { TextInput, View } from "react-native";
-import * as Updates from "expo-updates";
 
 function getId(id: string | string[]): number {
   if (typeof id === "string") return parseInt(id ?? 0);
@@ -44,9 +46,13 @@ export default function Settings() {
             eq(episodesTable.podcastId, routeId),
           ),
         );
-      console.log("episodes updated");
-      await Updates.reloadAsync();
     }
+  };
+
+  const onRemove = async () => {
+    const routeId = getId(id);
+    await db.delete(podcastsTable).where(eq(podcastsTable.id, routeId));
+    await db.delete(episodesTable).where(eq(episodesTable.podcastId, routeId));
   };
 
   return (
@@ -63,6 +69,14 @@ export default function Settings() {
         className="bg-green-500 rounded-full p-2 items-center"
       >
         <Text type="subtitle">Save</Text>
+      </Pressable>
+
+      <Text>To remove a podcast and all episodes, click the remove button</Text>
+      <Pressable
+        onPress={() => onRemove()}
+        className="rounded-full p-2 items-center border-red-500 border-2"
+      >
+        <Text type="subtitle">Remove</Text>
       </Pressable>
     </View>
   );

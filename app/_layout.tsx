@@ -10,7 +10,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import migrations from "../drizzle/migrations";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
-// import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
+import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
 import { useColorScheme } from "@/services/theme/useColorScheme";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { db, expoDb } from "@/db/db";
@@ -35,7 +35,9 @@ export default function RootLayout() {
     }
   }, [error]);
 
-  // useDrizzleStudio(expoDb);
+  if (__DEV__) {
+    useDrizzleStudio(expoDb);
+  }
 
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
