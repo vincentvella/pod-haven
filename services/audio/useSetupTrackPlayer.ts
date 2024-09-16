@@ -9,7 +9,6 @@ function useSetupTrackPlayer() {
   useEffect(() => {
     if (!initializedTrackPlayer) {
       TrackPlayer.setupPlayer().then(() => {
-        setInitializedTrackPlayer(true);
         TrackPlayer.updateOptions({
           progressUpdateEventInterval: 1,
           // Media control capabilities
@@ -27,6 +26,8 @@ function useSetupTrackPlayer() {
             appKilledPlaybackBehavior:
               AppKilledPlaybackBehavior.ContinuePlayback,
           },
+        }).then(() => {
+          setInitializedTrackPlayer(true);
         });
       });
     }

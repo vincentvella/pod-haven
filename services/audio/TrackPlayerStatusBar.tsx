@@ -58,9 +58,9 @@ function AudioSeeker() {
         width={width * 0.7}
         ref={ref}
         onSlideStart={() => (seeking.current = true)}
-        onSlideFinish={(value) => {
+        onSlideFinish={async (value) => {
           seeking.current = false;
-          TrackPlayer.seekTo(progress.duration * value);
+          await TrackPlayer.seekTo(progress.duration * value);
         }}
       />
       <Text type="title" className="text-md py-0 absolute right-2">
@@ -116,7 +116,7 @@ export default function TrackPlayerStatusBar() {
           <View className="flex-row items-center gap-6">
             <Pressable className="rounded-full items-center" activeScale={0.8}>
               <TabBarIcon
-                onPress={() => TrackPlayer.seekBy(-15)}
+                onPress={async () => TrackPlayer.seekBy(-15)}
                 name="play-back-circle"
                 color="white"
                 style={{ alignSelf: "center" }}
@@ -125,8 +125,10 @@ export default function TrackPlayerStatusBar() {
             </Pressable>
             <Pressable className="rounded-full items-center" activeScale={0.8}>
               <TabBarIcon
-                onPress={() =>
-                  isPlaying ? TrackPlayer.pause() : TrackPlayer.play()
+                onPress={async () =>
+                  isPlaying
+                    ? await TrackPlayer.pause()
+                    : await TrackPlayer.play()
                 }
                 name={isPlaying ? "pause-circle-sharp" : "play-circle-sharp"}
                 color="white"
@@ -136,7 +138,7 @@ export default function TrackPlayerStatusBar() {
             </Pressable>
             <Pressable className="rounded-full items-center" activeScale={0.8}>
               <TabBarIcon
-                onPress={() => TrackPlayer.seekBy(15)}
+                onPress={async () => await TrackPlayer.seekBy(15)}
                 name="play-forward-circle"
                 color="white"
                 style={{ alignSelf: "center" }}
