@@ -1,5 +1,7 @@
 import "../services/audio/registerTrackPlayer";
-import "expo-dev-client";
+if (__DEV__) {
+  require("expo-dev-client");
+}
 import {
   DarkTheme,
   DefaultTheme,
