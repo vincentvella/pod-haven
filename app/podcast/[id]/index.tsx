@@ -1,3 +1,4 @@
+import DownloadButton from "@/components/DownloadButton";
 import { Pressable } from "@/components/Pressable";
 import ProgressBar from "@/components/ProgressBar";
 import { Text } from "@/components/Text";
@@ -5,7 +6,10 @@ import { TabBarIcon } from "@/components/navigation/TabBarIcon";
 import { db } from "@/db/db";
 import { useEpisodes } from "@/db/hooks/episodes";
 import { podcasts } from "@/db/schema";
-import { convertItunesDuraitonToSeconds } from "@/services/audio/convertEpisodesToTracks";
+import {
+  convertItemsToTracks,
+  convertItunesDuraitonToSeconds,
+} from "@/services/audio/convertEpisodesToTracks";
 import { stripHtml } from "@/utils/html";
 import { FlashList } from "@shopify/flash-list";
 import { eq } from "drizzle-orm";
@@ -13,6 +17,7 @@ import { useLiveQuery } from "drizzle-orm/expo-sqlite";
 import { Link, useGlobalSearchParams, useNavigation } from "expo-router";
 import { Fragment, useEffect } from "react";
 import { Image, View } from "react-native";
+import TrackPlayer from "react-native-track-player";
 
 function getId(id: string | string[]): number {
   if (typeof id === "string") return parseInt(id ?? 0);
@@ -50,6 +55,25 @@ export default function Podcast() {
     }
   }, [podcast]);
 
+  const onPressItem = async (id: number) => {
+    TrackPlayer.reset();
+    const episode = episodes.find((e) => e.id === id);
+    if (!episode) return;
+    const [podcast] = await db
+      .select()
+      .from(podcasts)
+      .where(eq(podcasts.id, episode.podcastId ?? -1));
+    if (!podcast) return;
+    const tracks = await convertItemsToTracks([
+      { episodes: episode, podcasts: podcast },
+    ]);
+    await TrackPlayer.add(tracks);
+    if (episode.progress) {
+      await TrackPlayer.seekTo(episode.progress);
+    }
+    await TrackPlayer.play();
+  };
+
   if (!podcast) return null;
 
   return (
@@ -76,6 +100,7 @@ export default function Podcast() {
           return (
             <Fragment key={item.episodeId}>
               <Pressable
+                onPress={() => onPressItem(item.id)}
                 key={item.episodeId}
                 className="bg-slate-800 rounded-xl m-2"
               >
@@ -114,17 +139,10 @@ export default function Podcast() {
                         size={30}
                       />
                     </Pressable>
-                    <Pressable>
-                      <TabBarIcon
-                        // TODO: download episode - change to non-outlined version
-                        name="download-outline"
-                        color="white"
-                        size={30}
-                        style={{
-                          alignSelf: "center",
-                        }}
-                      />
-                    </Pressable>
+                    <DownloadButton
+                      uri={item.enclosures?.[0].url ?? ""}
+                      id={item.id}
+                    />
                     <View className="flex-1" />
                     <Pressable>
                       <TabBarIcon
@@ -139,13 +157,15 @@ export default function Podcast() {
                   </View>
                 </View>
 
-                {!!item.progress && (
+                {!!item.progress ? (
                   <ProgressBar
                     progress={item.progress}
                     duration={convertItunesDuraitonToSeconds(
                       item.itunes_duration ?? "00",
                     )}
                   />
+                ) : (
+                  <View className="h-2" />
                 )}
               </Pressable>
             </Fragment>

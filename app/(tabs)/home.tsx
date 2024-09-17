@@ -8,8 +8,6 @@ import { Fragment } from "react";
 import { router } from "expo-router";
 import { FlashList } from "@shopify/flash-list";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import ProgressBar from "@/components/ProgressBar";
-import { convertItunesDuraitonToSeconds } from "@/services/audio/convertEpisodesToTracks";
 
 export default function HomeScreen() {
   const { top } = useSafeAreaInsets();
