@@ -1,6 +1,8 @@
 import { AddTrack } from "react-native-track-player";
 import { episodes as episodesTable } from "@/db/schema";
 import { useReverseChronologicalUnwatchedEpisodesWithPodcastInfo } from "@/db/hooks/episodes";
+import { documentDirectory, getInfoAsync } from "expo-file-system";
+import { getFileExtension } from "@/services/fs/getFileExtension";
 
 export type Episode = typeof episodesTable.$inferSelect;
 
@@ -21,29 +23,37 @@ export function convertItunesDuraitonToSeconds(itunesDuration: string) {
   }
 }
 
-export function convertItemsToTracks(
+export async function convertItemsToTracks(
   items: ReturnType<
     typeof useReverseChronologicalUnwatchedEpisodesWithPodcastInfo
   >["data"],
-): AddTrack[] {
-  return items.reduce((acc, item) => {
+): Promise<AddTrack[]> {
+  const tracks: AddTrack[] = [];
+
+  for (const item of items) {
     if (!item.episodes.enclosures || item.episodes.enclosures.length === 0) {
-      return acc;
+      continue;
     }
 
+    const { exists, uri } = await getInfoAsync(
+      `${documentDirectory}${item.episodes.id}.${getFileExtension(item.episodes.enclosures[0].url)}`,
+    );
     const track = {
       id: item.episodes.episodeId,
       title: item.episodes.title ?? "",
-      url: item.episodes.enclosures[0].url,
+      url: exists ? uri : item.episodes.enclosures[0].url,
       artist: item.podcasts?.collectionName ?? "",
       artwork: item.podcasts?.artworkUrl600 ?? "",
       duration: convertItunesDuraitonToSeconds(
         item.episodes.itunes_duration ?? "00",
       ),
+      headers: {
+        id: `${item.episodes.id}`,
+        ext: getFileExtension(item.episodes.enclosures[0].url),
+      },
     } satisfies AddTrack;
 
-    acc.push(track);
-
-    return acc;
-  }, [] as AddTrack[]);
+    tracks.push(track);
+  }
+  return tracks;
 }

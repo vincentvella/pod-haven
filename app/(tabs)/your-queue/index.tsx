@@ -1,4 +1,4 @@
-import { View, useWindowDimensions } from "react-native";
+import { View } from "react-native";
 import { Text } from "@/components/Text";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { usePodcasts } from "@/db/hooks/podcasts";
@@ -6,7 +6,7 @@ import { Pressable } from "@/components/Pressable";
 import { TabBarIcon } from "@/components/navigation/TabBarIcon";
 import { fetchNewPodcasts } from "@/api/podcasts";
 import { useReverseChronologicalUnwatchedEpisodesWithPodcastInfo } from "@/db/hooks/episodes";
-import { Fragment, useEffect, useRef } from "react";
+import { Fragment } from "react";
 import { FlashList } from "@shopify/flash-list";
 import TrackPlayer from "react-native-track-player";
 import {
@@ -15,8 +15,8 @@ import {
 } from "@/services/audio/convertEpisodesToTracks";
 import { Image } from "@/components/Image";
 import { stripHtml } from "@/utils/html";
-import Slider, { ISlider } from "rn-video-slider";
 import ProgressBar from "@/components/ProgressBar";
+import DownloadButton from "@/components/DownloadButton";
 
 export default function QueueScreen() {
   const { data: savedPodcasts } = usePodcasts();
@@ -30,7 +30,7 @@ export default function QueueScreen() {
   const onPressItem = async (index: number) => {
     // create slice of the episodes array from the index to the end of the array
     const episodesSlice = episodes.slice(index);
-    const tracks = convertItemsToTracks(episodesSlice);
+    const tracks = await convertItemsToTracks(episodesSlice);
     await TrackPlayer.reset();
     await TrackPlayer.add(tracks);
     const firstEpisode = episodesSlice[0];
@@ -41,7 +41,6 @@ export default function QueueScreen() {
   };
 
   const { top } = useSafeAreaInsets();
-  const { width } = useWindowDimensions();
 
   return (
     <View className={`flex-1 bg-slate-950`} style={{ paddingTop: top }}>
@@ -116,17 +115,10 @@ export default function QueueScreen() {
                 {stripHtml(item.episodes.description ?? "<div></div>")}
               </Text>
               <View className="flex-row items-center pb-2">
-                <Pressable>
-                  <TabBarIcon
-                    // TODO: download episode - change to non-outlined version
-                    name="download-outline"
-                    color="white"
-                    size={30}
-                    style={{
-                      alignSelf: "center",
-                    }}
-                  />
-                </Pressable>
+                <DownloadButton
+                  id={item.episodes.id}
+                  uri={item.episodes.enclosures?.[0].url ?? ""}
+                />
                 <View className="flex-1" />
               </View>
               {!!item.episodes.progress && (
