@@ -140,7 +140,7 @@ export default function Podcast() {
                       />
                     </Pressable>
                     <DownloadButton
-                      uri={item.enclosures?.[0].url ?? ""}
+                      uri={item.enclosures?.[0]?.url ?? ""}
                       id={item.id}
                     />
                     <View className="flex-1" />

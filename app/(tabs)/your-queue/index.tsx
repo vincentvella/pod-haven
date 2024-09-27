@@ -1,10 +1,8 @@
 import { View } from "react-native";
 import { Text } from "@/components/Text";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { usePodcasts } from "@/db/hooks/podcasts";
 import { Pressable } from "@/components/Pressable";
 import { TabBarIcon } from "@/components/navigation/TabBarIcon";
-import { fetchNewPodcasts } from "@/api/podcasts";
 import { useReverseChronologicalUnwatchedEpisodesWithPodcastInfo } from "@/db/hooks/episodes";
 import { Fragment } from "react";
 import { FlashList } from "@shopify/flash-list";
@@ -17,15 +15,11 @@ import { Image } from "@/components/Image";
 import { stripHtml } from "@/utils/html";
 import ProgressBar from "@/components/ProgressBar";
 import DownloadButton from "@/components/DownloadButton";
+import { RefreshButton } from "@/components/RefreshButton";
 
 export default function QueueScreen() {
-  const { data: savedPodcasts } = usePodcasts();
   const { data: episodes } =
     useReverseChronologicalUnwatchedEpisodesWithPodcastInfo();
-
-  const onRefresh = async () => {
-    await fetchNewPodcasts(savedPodcasts);
-  };
 
   const onPressItem = async (index: number) => {
     // create slice of the episodes array from the index to the end of the array
@@ -53,24 +47,7 @@ export default function QueueScreen() {
               <Text type="title">Your Queue</Text>
             </View>
             {/* Add Refresh button for refreshing the queue */}
-            <Pressable
-              className="bg-green-500 rounded-full p-2 mx-12 items-center mb-2"
-              onPress={onRefresh}
-            >
-              <View className="flex-row justify-center items-center">
-                <TabBarIcon
-                  name="refresh"
-                  style={{ alignSelf: "center" }}
-                  size={18}
-                />
-                <Text
-                  type="subtitle"
-                  className="text-xl self-center dark:color-black"
-                >
-                  Refresh
-                </Text>
-              </View>
-            </Pressable>
+            <RefreshButton />
           </>
         }
         data={episodes}
@@ -117,7 +94,7 @@ export default function QueueScreen() {
               <View className="flex-row items-center pb-2">
                 <DownloadButton
                   id={item.episodes.id}
-                  uri={item.episodes.enclosures?.[0].url ?? ""}
+                  uri={item.episodes.enclosures?.[0]?.url ?? ""}
                 />
                 <View className="flex-1" />
               </View>

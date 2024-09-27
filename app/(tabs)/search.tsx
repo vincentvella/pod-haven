@@ -1,9 +1,6 @@
 import { ActivityIndicator, Image, TextInput, View } from "react-native";
 import { db } from "@/db/db";
 import { podcasts as podcastTable } from "@/db/schema";
-
-export type Podcast = typeof podcasts.$inferSelect;
-
 import { Text } from "@/components/Text";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Fragment, useState } from "react";
@@ -13,6 +10,8 @@ import { podcasts } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { usePodcasts } from "@/db/hooks/podcasts";
 import { FlashList } from "@shopify/flash-list";
+
+export type Podcast = typeof podcasts.$inferSelect;
 
 export default function SearchScreen() {
   const [settingPodcast, setSettingPodcast] = useState<Podcast>();

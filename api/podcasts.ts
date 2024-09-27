@@ -9,8 +9,22 @@ import parse from "rss-to-json";
 type Podcast = typeof podcastsTable.$inferSelect;
 type Episode = typeof episodesTable.$inferSelect;
 
-export async function fetchNewPodcasts(savedPodcasts: Podcast[]) {
-  for (const podcast of savedPodcasts) {
+type OnCheckingPodcasts = (
+  podcast: Podcast,
+  position: number,
+  total: number,
+) => void;
+type OnFoundEpisodes = (episodesToDownload: number) => void;
+type OnSavingEpisodes = (episodesToSave: number) => void;
+
+export async function fetchNewPodcasts(
+  savedPodcasts: Podcast[],
+  onCheckingPodcasts: OnCheckingPodcasts,
+  onFoundEpisodes: OnFoundEpisodes,
+  onSavingEpisodes: OnSavingEpisodes,
+) {
+  for (const [i, podcast] of savedPodcasts.entries()) {
+    onCheckingPodcasts(podcast, i, savedPodcasts.length);
     if (!podcast.feedUrl) continue;
     const lastSavedPodcast = await db
       .select()
@@ -20,6 +34,7 @@ export async function fetchNewPodcasts(savedPodcasts: Podcast[]) {
       .limit(1);
     const response = await parse(podcast.feedUrl);
     if (!lastSavedPodcast.length) {
+      onFoundEpisodes(response.items.length);
       const items = response.items.map((item) => ({
         ...item,
         id: undefined,
@@ -30,9 +45,13 @@ export async function fetchNewPodcasts(savedPodcasts: Podcast[]) {
       continue;
     } else {
       const lastSavedEpisode = lastSavedPodcast[0];
+      const itemIndex = response.items.findIndex(
+        (item: any) => item.title === lastSavedEpisode.title,
+      );
       console.log(
         `Found an episode for ${podcast.collectionName}... saving episodes newer than: ${new Date(lastSavedEpisode.created ?? 0).toLocaleString()}`,
       );
+      onFoundEpisodes(itemIndex);
       // refactor the below code to use a reduce function and add the podcastId to the item
       const items = response.items.reduce((acc, item) => {
         if (!item.created) {
@@ -55,6 +74,7 @@ export async function fetchNewPodcasts(savedPodcasts: Podcast[]) {
       }, [] as Episode[]);
       if (items.length > 0) {
         console.log(`Saving ${items.length} episodes`);
+        onSavingEpisodes(items.length);
         await db.insert(episodesTable).values(items).onConflictDoNothing();
       } else {
         console.log("No new episodes found");
