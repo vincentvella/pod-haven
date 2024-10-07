@@ -59,14 +59,24 @@ export async function fetchNewPodcasts(
         } else if (!lastSavedEpisode.created) {
           // if the last saved episode doesn't have a created date, add any podcasts newer than a week
           if (item.created > Date.now() - 7 * 24 * 60 * 60 * 1000) {
-            acc.push({ ...item, episodeId: item.id, podcastId: podcast.id });
+            acc.push({
+              ...item,
+              id: undefined,
+              episodeId: item.id,
+              podcastId: podcast.id,
+            });
             return acc;
           }
           // if the last saved episode doesn't have a created date and the current item is newer than a week, ignore it
           return acc;
         } else if (item.created > lastSavedEpisode.created) {
           // if the current item is newer than the last saved episode, add it
-          acc.push({ ...item, episodeId: item.id, podcastId: podcast.id });
+          acc.push({
+            ...item,
+            id: undefined,
+            episodeId: item.id,
+            podcastId: podcast.id,
+          });
           return acc;
         } else {
           return acc;
