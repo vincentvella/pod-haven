@@ -17,6 +17,7 @@ export type DownloadButtonProps = {
 };
 
 export default function DownloadButton({ uri, id }: DownloadButtonProps) {
+  const [isAttemptingToDownload, setIsAttemptingToDownload] = useState(false);
   const [downloaded, setDownloaded] = useState(false);
   const [progress, setProgress] = useState(0);
   const fileName = useRef<string>(
@@ -44,6 +45,10 @@ export default function DownloadButton({ uri, id }: DownloadButtonProps) {
     }
   };
   const downloadEpisode = async () => {
+    if (isAttemptingToDownload) {
+      return;
+    }
+    setIsAttemptingToDownload(true);
     const downloadResumable = createDownloadResumable(
       uri,
       fileName.current,
@@ -63,11 +68,12 @@ export default function DownloadButton({ uri, id }: DownloadButtonProps) {
     checkDownloaded();
   }, []);
 
-  const isDownloading = progress !== 0 && progress !== 100;
+  const isDownloading =
+    isAttemptingToDownload && progress !== 0 && progress !== 100;
 
   return (
     <Pressable
-      disabled={downloaded}
+      disabled={downloaded || isDownloading}
       onPress={downloadEpisode}
       style={{ height: 50 }}
     >
